@@ -2,46 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rikimaru_chat/models/auth_model.dart';
 
-class Signup extends StatefulWidget{
-  const Signup({Key? key}) : super(key: key);
+class Login extends StatefulWidget{
+  const Login({Key? key}) : super(key: key);
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<Login> createState() => _LoginState();
 }
 
-class _SignupState extends State<Signup> {
-  final TextEditingController _displayNameController = TextEditingController();
+class _LoginState extends State<Login> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  void createAccount() async {
-    String displayName = _displayNameController.text;
-    String username = _usernameController.text;
-    String password = _passwordController.text;
 
-    final bool result = await Provider.of<Auth>(context, listen: false).createAccount(displayName, username, password);
+  Future<void> login() async {
+    String userName = _usernameController.text;
+    String password = _passwordController.text;
+    final result = await Provider.of<Auth>(context, listen: false).loginWithPassword(userName, password);
+
     if (result) {
-      await routeToLogin();
+      await Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
     }
     else {
       showDialog(context: context, builder: (context) {
         return const AlertDialog(
           alignment: Alignment.center,
           title: Text("Message", textAlign: TextAlign.center,),
-          content: SizedBox(width: 100, height: 50, child: Center(child: Text("Đăng kí tài khoản không thành công, vui lòng thử lại", textAlign: TextAlign.center,),)),
+          content: SizedBox(width: 100, height: 50, child: Center(child: Text("Đăng nhập không thành công", textAlign: TextAlign.center,),)),
         );
       });
     }
   }
-  Future<void> routeToLogin() async {
+
+  Future<void> routeToSignup () async {
     routeBack();
-    await Navigator.of(context).pushNamed('/login');
+    await Navigator.of(context).pushNamed('/signup');
   }
-  void routeBack() {
+
+  routeBack() {
     Navigator.of(context).pop();
   }
+  
   @override
   Widget build(BuildContext context) {
-    // ignore: avoid_unnecessary_containers
     return Scaffold(
       body: SafeArea(
         maintainBottomViewPadding: true,
@@ -63,24 +64,11 @@ class _SignupState extends State<Signup> {
                   width: MediaQuery.of(context).size.width,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 20),
-                  child: const Text("Create \nAccount", style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text("Welcome \nBack", style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          prefixIcon: Icon(Icons.person_outline_rounded),
-                          suffixIcon: Icon(Icons.check),
-                        ),
-                        controller: _displayNameController,
-                      ),
-                    ),
-                    const SizedBox(height: 10.0,),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextField(
@@ -97,7 +85,9 @@ class _SignupState extends State<Signup> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextField(
+                        autofocus: true,
                         obscureText: true,
+                        focusNode: FocusNode(),
                         decoration: const InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -121,12 +111,12 @@ class _SignupState extends State<Signup> {
                   ),
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: createAccount, 
+                    onPressed: login, 
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.blue),
                       overlayColor: MaterialStateProperty.all(Colors.blueAccent)
                     ),
-                    child: const Text("Sign up", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                    child: const Text("Log in", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
                   ),
                 ),
                 Container(
@@ -144,13 +134,13 @@ class _SignupState extends State<Signup> {
                   margin: const EdgeInsets.symmetric(horizontal: 20.0),
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: routeToLogin, 
+                    onPressed: routeToSignup, 
                     style: ButtonStyle(
                       side: MaterialStateProperty.all(const BorderSide(width: 1.0, color: Colors.grey)),
                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
                       overlayColor: MaterialStateProperty.all(Colors.lightBlue.shade100)
                     ),
-                    child: const Text("Log in", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))
+                    child: const Text("Sign up", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))
                   ),
                 ),
               ],
