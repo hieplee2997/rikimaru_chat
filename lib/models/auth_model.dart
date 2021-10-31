@@ -92,17 +92,17 @@ class Auth extends ChangeNotifier {
     if (!prefs.containsKey('userData')) {
       return false;
     }
-
+    log("Try auto login");
+    // await Future.delayed(const Duration(seconds: 2));
     final userData = json.decode(prefs.getString('userData')!);
     _token = userData['token'].toString();
     _userId = userData['userId'].toString();
     _expire = DateTime.parse(userData['expire'].toString());
-    print("try auto login");
     notifyListeners();
     return true;
   }
 
-  Future<bool> createAccount(String displayName, String username, String password) async {
+  Future<Map<String, dynamic>> createAccount(String displayName, String username, String password) async {
     final url = Uri.parse("http://127.0.0.1:4000/api/users/register");
 
     try {
@@ -119,30 +119,13 @@ class Auth extends ChangeNotifier {
 
       final resData = json.decode(response.body);
       if (resData['success'] == false) {
-        throw HttpException(resData['message']);
+        throw resData['message'];
       }
-
-      _token = resData['access_token'];
-      _userId = resData['data']['id'].toString();
-      _expire = DateTime.fromMillisecondsSinceEpoch(
-        resData['expire_in'] * 1000
-      );
-      final preferrence = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': _token,
-          'userId': _userId,
-          'expire': _expire!.toIso8601String()
-        }
-      );
-      preferrence.setString('userData', userData);
-      logout();
-      notifyListeners();
-      return true;
+      return {'ok': true, 'message': resData['message']};
     } catch (e, trace) {
       log(e.toString());
       log(trace.toString());
-      return false;
+      return {'ok': false, 'message': e.toString()};
     }
   }
   Future<void> logout() async {
@@ -156,8 +139,6 @@ class Auth extends ChangeNotifier {
       _token = "";
       _expire = null;
       _userId = "";
-      print("logout");
-      notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.clear();
     } catch (e) {

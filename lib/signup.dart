@@ -18,19 +18,22 @@ class _SignupState extends State<Signup> {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
-    final bool result = await Provider.of<Auth>(context, listen: false).createAccount(displayName, username, password);
-    if (result) {
-      await routeToLogin();
+    final Map result = await Provider.of<Auth>(context, listen: false).createAccount(displayName, username, password);
+    await showDialog(context: context, builder: (context) {
+      const title = "Message";
+      final content = result['message'];
+      
+      return AlertDialog(
+        alignment: Alignment.center,
+        title: const Text(title, textAlign: TextAlign.center,),
+        content: SizedBox(width: 100, height: 70, child: Center(child: Text(content, textAlign: TextAlign.center))),
+      );
+    });
+
+    if (result['ok']) {
+      routeToLogin();
     }
-    else {
-      showDialog(context: context, builder: (context) {
-        return const AlertDialog(
-          alignment: Alignment.center,
-          title: Text("Message", textAlign: TextAlign.center,),
-          content: SizedBox(width: 100, height: 50, child: Center(child: Text("Đăng kí tài khoản không thành công, vui lòng thử lại", textAlign: TextAlign.center,),)),
-        );
-      });
-    }
+    
   }
   Future<void> routeToLogin() async {
     routeBack();
@@ -71,6 +74,7 @@ class _SignupState extends State<Signup> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextField(
+                        autocorrect: false,
                         decoration: const InputDecoration(
                           filled: true,
                           fillColor: Colors.white,

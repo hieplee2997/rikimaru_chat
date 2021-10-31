@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rikimaru_chat/dashboard.dart';
+import 'package:rikimaru_chat/friend_screen.dart';
+import 'package:rikimaru_chat/login.dart';
 import 'package:rikimaru_chat/main_screen.dart';
 import 'package:rikimaru_chat/models/auth_model.dart';
 import 'package:rikimaru_chat/models/user_model.dart';
 import 'package:rikimaru_chat/route.dart';
+import 'package:rikimaru_chat/signup.dart';
 
 void main() {
   AppRoutes.setupRouter();
@@ -33,7 +36,7 @@ class RikimaruAppChat extends StatelessWidget {
                     future: auth.tryAutoLogin(),
                     builder: (context, authResult) => 
                     authResult.connectionState == ConnectionState.waiting ?
-                    Container(color: Colors.red,) : const MainScreen(),
+                    Container(color: Colors.red) : const MainScreen(),
                   ),
             onGenerateRoute: AppRoutes.router.generator,
           );
