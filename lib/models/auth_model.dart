@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:phoenix_wings/phoenix_wings.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:rikimaru_chat/models/conversation_model.dart';
 import 'package:rikimaru_chat/models/user_model.dart';
 import 'package:rikimaru_chat/models/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,7 @@ class Auth extends ChangeNotifier {
   String _userId = "";
 
   String get token => _token;
+  String get userId => _userId;
 
   bool get isAuth {
     bool isExpire = _expire != null && _expire!.isBefore(DateTime.now()) && _token != "";
@@ -35,14 +37,23 @@ class Auth extends ChangeNotifier {
   Future<void> connectSocket(BuildContext context) async {
     _socket = PhoenixSocket('ws://127.0.0.1:4000/socket/websocket');
     await _socket.connect();
-    _channel = _socket.channel('user:lobby');
+    _channel = _socket.channel('user:$_userId');
     var channel = _channel;
     channel.join()?.receive("ok", (response) => {
       _channel = channel,
       log("Channel connected"),
+      Provider.of<Conversation>(context, listen: false).getDataConversation(_token),
       Provider.of<User>(context, listen: false).fetchMe(token),
     }).receive("error", (response) => {
       log("Unable join channel")
+    });
+    channel.on("create_conversation", (data, ref, joinRef) {
+      // print(data);
+      Provider.of<Conversation>(context, listen: false).getDataConversation(token);
+    });
+    channel.on("broadcast_new_message", (data, ref, joinRef) {
+      // print(data);
+      Provider.of<Conversation>(context, listen: false).onMessage(data!["data"]);
     });
   }
   Future<bool> loginWithPassword(String userName, String password) async {
@@ -72,7 +83,7 @@ class Auth extends ChangeNotifier {
       final preferrence = await SharedPreferences.getInstance();
       final userData = json.encode({
         'token': _token,
-        'userId': _userId,
+        'user_id': _userId,
         'expire': _expire!.toIso8601String()
       });
 
@@ -81,7 +92,7 @@ class Auth extends ChangeNotifier {
       return true;
       
     } catch (e) {
-      log(e.toString());
+      print(e.toString());
       // log(trace.toString());
       return false;
     }
@@ -96,7 +107,7 @@ class Auth extends ChangeNotifier {
     // await Future.delayed(const Duration(seconds: 2));
     final userData = json.decode(prefs.getString('userData')!);
     _token = userData['token'].toString();
-    _userId = userData['userId'].toString();
+    _userId = userData['user_id'].toString();
     _expire = DateTime.parse(userData['expire'].toString());
     notifyListeners();
     return true;
@@ -123,8 +134,8 @@ class Auth extends ChangeNotifier {
       }
       return {'ok': true, 'message': resData['message']};
     } catch (e, trace) {
-      log(e.toString());
-      log(trace.toString());
+      print(e.toString());
+      print(trace.toString());
       return {'ok': false, 'message': e.toString()};
     }
   }

@@ -24,7 +24,6 @@ class _SignupState extends State<Signup> {
       final content = result['message'];
       
       return AlertDialog(
-        alignment: Alignment.center,
         title: const Text(title, textAlign: TextAlign.center,),
         content: SizedBox(width: 100, height: 70, child: Center(child: Text(content, textAlign: TextAlign.center))),
       );

@@ -50,7 +50,7 @@ class _DashBoardState extends State<DashBoard> {
           margin: const EdgeInsets.symmetric(horizontal: 20.0),
           decoration: BoxDecoration(
             color: Colors.white.withAlpha(230),
-            boxShadow: const [BoxShadow(blurRadius: 55.0, blurStyle: BlurStyle.outer, color: Colors.black38)],
+            // boxShadow: const [BoxShadow(blurRadius: 55.0, blurStyle: BlurStyle.outer, color: Colors.black38)],
             borderRadius: BorderRadius.circular(20.0)
           ),
           child: Row(children: [

@@ -1,19 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rikimaru_chat/cache_avatar.dart';
+import 'package:rikimaru_chat/models/auth_model.dart';
+import 'package:rikimaru_chat/conversation.dart';
 
 class ChatItem extends StatefulWidget{
-  const ChatItem({Key? key, required this.user}) : super(key: key);
+  const ChatItem({Key? key, required this.conversation}) : super(key: key);
 
-  final dynamic user;
+  final dynamic conversation;
   @override
   State<ChatItem> createState() => _ChatItemState();
 }
 
 class _ChatItemState extends State<ChatItem> {
+
+  String getFieldNameConversation(List user) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    var result = "";
+    result = user.lastWhere((user) => user["user_id"] != userId)["full_name"].toString();
+    return result;
+  }
+
+  getFriendConversation(List user) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    var result = user.lastWhere((user) => user["user_id"] != userId);
+    return result;
+  }
+
+  selectConversation(dynamic conversation) {
+    Navigator.push(context, PageRouteBuilder(
+      pageBuilder: (context, a1, a2) {
+        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: "");
+      }
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){},
+      onTap: () => selectConversation(widget.conversation),
       child: Container(
         padding: const EdgeInsets.all(12.0),
         margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -24,11 +49,11 @@ class _ChatItemState extends State<ChatItem> {
           border: Border.all(width: 0.5, color: Colors.grey)
         ),
         child: Row(children: [
-          CachedAvatar("",name: widget.user['full_name'], height: 50, width: 50,),
+          CachedAvatar("",name: getFieldNameConversation(widget.conversation["users"]), height: 50, width: 50),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Column(children: [
-              Text(widget.user['full_name'], style: const TextStyle(fontSize: 16.0,fontWeight: FontWeight.w800)),
+              Text(getFieldNameConversation(widget.conversation["users"]), style: const TextStyle(fontSize: 16.0,fontWeight: FontWeight.w800)),
               const Text('last message')
             ], crossAxisAlignment: CrossAxisAlignment.start),
           )

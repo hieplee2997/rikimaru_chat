@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rikimaru_chat/models/auth_model.dart';
+import 'package:rikimaru_chat/models/conversation_model.dart';
+import 'package:rikimaru_chat/models/user_model.dart';
 
 import 'cache_avatar.dart';
+import 'conversation.dart';
 
 class FriendItem extends StatefulWidget {
   const FriendItem({Key? key, required this.user}) : super(key: key);
@@ -12,10 +17,28 @@ class FriendItem extends StatefulWidget {
 }
 
 class _FriendItemState extends State<FriendItem> {
+
+  String getFieldNameConversation(List user) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    var result = "";
+    result = user.lastWhere((user) => user["user_id"] != userId)["full_name"].toString();
+    return result;
+  }
+
+  void selectConversation(user) {
+    final me = Provider.of<User>(context, listen: false).me;
+    final users = [me] + [user];
+    final conversation =  Provider.of<Conversation>(context, listen: false).selectConversation(users);
+    Navigator.push(context, PageRouteBuilder(
+      pageBuilder: (context, a1, a2) {
+        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: "");
+      }
+    ));
+  }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){},
+      onTap: () => selectConversation(widget.user),
       child: Container(
         padding: const EdgeInsets.all(12.0),
         margin: const EdgeInsets.symmetric(vertical: 10.0),

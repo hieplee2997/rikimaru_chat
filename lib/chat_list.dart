@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rikimaru_chat/models/conversation_model.dart';
 
 import 'chat_item.dart';
 import 'models/user_model.dart';
@@ -12,7 +13,7 @@ class ChatList extends StatefulWidget {
 class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
-    final conversation = Provider.of<User>(context, listen: true).conversation;
+    final listConversation = Provider.of<Conversation>(context, listen: true).data;
     return Column(children: [
       Padding(
         padding: const EdgeInsets.only(top: 8.0),
@@ -53,8 +54,8 @@ class _ChatListState extends State<ChatList> {
         child: SingleChildScrollView(
           controller: ScrollController(),
           child: Column(
-            children: conversation.map<Widget>((friend){
-              return ChatItem(user: friend);
+            children: listConversation.map<Widget>((conversation){
+              return ChatItem(conversation: conversation);
             }).toList(),
           ),
         ),

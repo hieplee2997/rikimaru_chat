@@ -7,15 +7,13 @@ import 'package:rikimaru_chat/models/utils.dart';
 
 import 'package:http/http.dart' as http;
 class User extends ChangeNotifier {
-  Map _me = {'full_name': '', 'user_name': '', 'id': ''};
+  Map _me = {'full_name': '', 'user_name': '', 'user_id': ''};
   Map? _otherUser;
   List _friendList = [];
-  List _conversation = [];
 
   Map get me => _me;
   Map? get otherUser => _otherUser;
   List get friendList => _friendList;
-  List get conversation => _conversation;
   
   Future<void> fetchMe(String token) async {
     final url = Utils.apiUrl + "/users/fetch_me?token=$token";

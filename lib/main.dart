@@ -5,6 +5,7 @@ import 'package:rikimaru_chat/friend_screen.dart';
 import 'package:rikimaru_chat/login.dart';
 import 'package:rikimaru_chat/main_screen.dart';
 import 'package:rikimaru_chat/models/auth_model.dart';
+import 'package:rikimaru_chat/models/conversation_model.dart';
 import 'package:rikimaru_chat/models/user_model.dart';
 import 'package:rikimaru_chat/route.dart';
 import 'package:rikimaru_chat/signup.dart';
@@ -22,7 +23,8 @@ class RikimaruAppChat extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Auth()),
-        ChangeNotifierProvider(create: (_) => User())
+        ChangeNotifierProvider(create: (_) => User()),
+        ChangeNotifierProvider(create: (_) => Conversation())
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {

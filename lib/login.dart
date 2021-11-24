@@ -24,7 +24,6 @@ class _LoginState extends State<Login> {
     else {
       showDialog(context: context, builder: (context) {
         return const AlertDialog(
-          alignment: Alignment.center,
           title: Text("Message", textAlign: TextAlign.center,),
           content: SizedBox(width: 100, height: 50, child: Center(child: Text("Đăng nhập không thành công", textAlign: TextAlign.center,),)),
         );
