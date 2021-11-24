@@ -16,13 +16,28 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   String conversationId = "";
   TextEditingController textEditingController = TextEditingController();
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     final token = Provider.of<Auth>(context, listen: false).token;
     conversationId = widget.id;
-    Provider.of<Conversation>(context, listen: false).loadMessages(conversationId, token);
+    final dataMessageLength = Provider.of<Conversation>(context, listen: false).messages.lastWhere((element) => element["conversation_id"] == conversationId, orElse: () => {'conversation_id': '', 'messages': []})["messages"].length;
+    if (dataMessageLength == 0) Provider.of<Conversation>(context, listen: false).loadMessages(conversationId, token);
+    scrollController.addListener(scrollListener);
+  }
+
+  void scrollListener() {
+    if (scrollController.position.extentAfter < 20) {
+      List dataMessages = Provider.of<Conversation>(context, listen: false).messages;
+      final indexConversationMessage = dataMessages.indexWhere((element) => element["conversation_id"] == conversationId);
+      List messagesConversation = dataMessages[indexConversationMessage]["messages"];
+      final lastMessage = messagesConversation.last;
+      final lastMessageId = lastMessage["id"];
+      final token = Provider.of<Auth>(context, listen: false).token;
+      Provider.of<Conversation>(context, listen: false).loadMoreMessage(conversationId, lastMessageId, token);
+    }
   }
 
   void createMessage() async {
@@ -34,6 +49,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final friendId = users.firstWhere((element) => element["user_id"] != userId)["user_id"];
     conversationId = await Provider.of<Conversation>(context, listen: false).handleSendMessage(message, conversationId, friendId, token);
     textEditingController.clear();
+    scrollController.animateTo(0.0, duration: const Duration(milliseconds: 100), curve: Curves.easeOutCirc);
   }
   @override
   Widget build(BuildContext context) {
@@ -87,6 +103,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     color: Colors.white
                   ),
                   child: ListView.builder(
+                    key: const PageStorageKey<String>('controllerA'),
+                    controller: scrollController,
                     reverse: true,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
@@ -95,7 +113,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       return Row(
                         children: [
                           if (isMe) Expanded(child: Container()),
-                          Text(messages[index]["message"], style: TextStyle(color: !isMe ? Colors.red : Colors.blue)),
+                          Container(color: Colors.green[100], margin: const EdgeInsets.symmetric(horizontal: 5), height: 40, child: Text("$index ${messages[index]["message"]}", style: TextStyle(color: !isMe ? Colors.red : Colors.blue))),
                           if (!isMe) Expanded(child: Container())
                         ],
                       );

@@ -90,6 +90,7 @@ class Conversation extends ChangeNotifier {
       var messageConversationDummy = {
         "conversation_id": idConversationDummy,
         "messages": [],
+        "isFetching": false,
         "status": ConversationStatus.init,
         "queue": Scheduler()
       };
@@ -111,9 +112,12 @@ class Conversation extends ChangeNotifier {
       final resData = json.decode(resp.body);
 
       if (resData["success"]) {
+
         final messageLoaded = {
+          ..._messages[indexConversationMessage],
           'conversation_id': conversationId,
-          'messages': resData["data"]["messages"]
+          'messages': resData["data"]["messages"],
+          "isFetching": false
         };
         if (indexConversationMessage != -1) {
           _messages[indexConversationMessage]= messageLoaded;
@@ -122,6 +126,31 @@ class Conversation extends ChangeNotifier {
         }
       }
       notifyListeners();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> loadMoreMessage(String conversationId, String lastMessageId, String token) async {
+    final indexConversationMessage = _messages.indexWhere((element) => element["conversation_id"] == conversationId);
+    if (indexConversationMessage == -1) return;
+    if (_messages[indexConversationMessage]["status"] == ConversationStatus.init || _messages[indexConversationMessage]["isFetching"] == true) return;
+    _messages[indexConversationMessage]["isFetching"] = true;
+    final url = Utils.apiUrl + "/users/conversation/load_more_messages?token=$token&conversation_id=$conversationId&last_id=$lastMessageId";
+    try {
+      final resp = await http.get(Uri.parse(url));
+      final resData = json.decode(resp.body);
+
+      if (resData["success"]) {
+        final messagesLoad = resData["data"];
+        _messages[indexConversationMessage]["messages"] = _messages[indexConversationMessage]["messages"] + messagesLoad;
+        _messages[indexConversationMessage]["isFetching"] = false;
+        // print(messagesLoad);
+        notifyListeners();
+      }
+      else {
+        throw Exception(resData["message"]);
+      }
     } catch (e) {
       print(e.toString());
     }
