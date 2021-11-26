@@ -226,6 +226,24 @@ class Conversation extends ChangeNotifier {
           notifyListeners();
         }
       }
+      final indexConversation = _data.indexWhere((element) => element["conversation_id"] == dataIndex["conversation_id"]);
+      if (indexConversation != -1) {
+        var tempConversation = _data[indexConversation];
+        _data.removeAt(indexConversation);
+        _data = [tempConversation] + _data;
+      }
+    }
+  }
+
+  Future<void> updateConversation(Map data) async {
+    final userId = data["user_id"];
+    for (var conversation in _data) {
+      List users = conversation["users"];
+      final indexUser = users.indexWhere((element) => element["user_id"] == userId);
+      users[indexUser] = data;
+      final indexConverstion = _data.indexWhere((element) => element["conversation_id"] == conversation["conversation_id"]);
+      _data[indexConverstion]["users"] = users;
+      notifyListeners();
     }
   }
 

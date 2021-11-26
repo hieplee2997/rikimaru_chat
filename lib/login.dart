@@ -59,7 +59,7 @@ class _LoginState extends State<Login> {
                   icon: const Icon(Icons.arrow_back_ios_new, size:34, color: Colors.white,)
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height / 2,
+                  height: MediaQuery.of(context).size.height / 5,
                   width: MediaQuery.of(context).size.width,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 20),
@@ -84,7 +84,6 @@ class _LoginState extends State<Login> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextField(
-                        autofocus: true,
                         obscureText: true,
                         focusNode: FocusNode(),
                         decoration: const InputDecoration(

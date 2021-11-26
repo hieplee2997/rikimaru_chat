@@ -35,7 +35,7 @@ class Auth extends ChangeNotifier {
   }
 
   Future<void> connectSocket(BuildContext context) async {
-    _socket = PhoenixSocket('ws://127.0.0.1:4000/socket/websocket');
+    _socket = PhoenixSocket('ws://192.168.3.6:4000/socket/websocket');
     await _socket.connect();
     _channel = _socket.channel('user:$_userId');
     var channel = _channel;
@@ -55,9 +55,13 @@ class Auth extends ChangeNotifier {
       // print(data);
       Provider.of<Conversation>(context, listen: false).onMessage(data!["data"]);
     });
+    channel.on("update_info_friend", (data, ref, joinRef) {
+      Provider.of<User>(context, listen: false).updateInfoFriend(data!);
+      Provider.of<Conversation>(context, listen: false).updateConversation(data);
+    });
   }
   Future<bool> loginWithPassword(String userName, String password) async {
-    final url = Uri.parse("http://127.0.0.1:4000/api/users/login");
+    final url = Uri.parse("${Utils.apiUrl}/users/login");
 
     try {
       final response = await http.post(url,
@@ -114,7 +118,7 @@ class Auth extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> createAccount(String displayName, String username, String password) async {
-    final url = Uri.parse("http://127.0.0.1:4000/api/users/register");
+    final url = Uri.parse("${Utils.apiUrl}/users/register");
 
     try {
       final response = await http.post(url,

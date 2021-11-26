@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:rikimaru_chat/models/conversation_model.dart';
 
 import 'chat_item.dart';
-import 'models/user_model.dart';
 
 class ChatList extends StatefulWidget {
   @override

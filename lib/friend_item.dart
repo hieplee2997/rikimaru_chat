@@ -25,13 +25,20 @@ class _FriendItemState extends State<FriendItem> {
     return result;
   }
 
+  String getFieldAvatarConversation(List user) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    var result = "";
+    result = user.lastWhere((user) => user["user_id"] != userId)["avatar_url"] ?? "";
+    return result;
+  }
+
   void selectConversation(user) {
     final me = Provider.of<User>(context, listen: false).me;
     final users = [me] + [user];
     final conversation =  Provider.of<Conversation>(context, listen: false).selectConversation(users);
     Navigator.push(context, PageRouteBuilder(
       pageBuilder: (context, a1, a2) {
-        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: "");
+        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: getFieldAvatarConversation(conversation["users"]));
       }
     ));
   }
@@ -49,7 +56,7 @@ class _FriendItemState extends State<FriendItem> {
           border: Border.all(width: 0.5, color: Colors.grey)
         ),
         child: Row(children: [
-          CachedAvatar("",name: widget.user['full_name'], height: 50, width: 50,),
+          CachedAvatar(widget.user["avatar_url"],name: widget.user['full_name'], height: 50, width: 50),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Column(children: [

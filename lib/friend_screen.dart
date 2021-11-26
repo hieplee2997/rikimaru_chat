@@ -28,22 +28,28 @@ class _FriendScreenState extends State<FriendScreen> {
   @override
   Widget build(BuildContext context) {
     final friendList = Provider.of<User>(context, listen: true).friendList;
-    return Column(
-        children: [
-          Center(
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: textEditingController,
+    return Material(
+      child: Column(
+          children: [
+            Center(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        constraints: const BoxConstraints(maxHeight: 60),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+                      ),
+                      controller: textEditingController,
+                    ),
                   ),
-                ),
-                IconButton(onPressed: addFriend, icon: const Icon(Icons.add))
-              ],
+                  IconButton(onPressed: addFriend, icon: const Icon(Icons.add))
+                ],
+              ),
             ),
-          ),
-          Expanded(child: SingleChildScrollView(child: Column(children: friendList.map<Widget>((e) => FriendItem(user: e)).toList()),))
-        ],
-      );
+            Expanded(child: SingleChildScrollView(child: Column(children: friendList.map<Widget>((e) => FriendItem(user: e)).toList()),))
+          ],
+        ),
+    );
   }
 }

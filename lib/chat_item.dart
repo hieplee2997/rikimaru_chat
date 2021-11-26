@@ -21,6 +21,13 @@ class _ChatItemState extends State<ChatItem> {
     return result;
   }
 
+  String getFieldAvatarConversation(List user) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    var result = "";
+    result = user.lastWhere((user) => user["user_id"] != userId)["avatar_url"] ?? "";
+    return result;
+  }
+
   getFriendConversation(List user) {
     final userId = Provider.of<Auth>(context, listen: false).userId;
     var result = user.lastWhere((user) => user["user_id"] != userId);
@@ -30,7 +37,7 @@ class _ChatItemState extends State<ChatItem> {
   selectConversation(dynamic conversation) {
     Navigator.push(context, PageRouteBuilder(
       pageBuilder: (context, a1, a2) {
-        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: "");
+        return ConversationScreen(id: conversation["conversation_id"], name: getFieldNameConversation(conversation["users"]), avatarUrl: getFieldAvatarConversation(conversation["users"]));
       }
     ));
   }
@@ -49,7 +56,7 @@ class _ChatItemState extends State<ChatItem> {
           border: Border.all(width: 0.5, color: Colors.grey)
         ),
         child: Row(children: [
-          CachedAvatar("",name: getFieldNameConversation(widget.conversation["users"]), height: 50, width: 50),
+          CachedAvatar(getFieldAvatarConversation(widget.conversation["users"]),name: getFieldNameConversation(widget.conversation["users"]), height: 50, width: 50),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Column(children: [
