@@ -7,6 +7,8 @@ import 'package:rikimaru_chat/models/auth_model.dart';
 import 'package:rikimaru_chat/models/user_model.dart';
 import 'package:rikimaru_chat/user_settings.dart';
 
+import 'models/call_modal.dart';
+
 class DashBoard extends StatefulWidget{
   const DashBoard({Key? key}) : super(key: key);
 
@@ -20,7 +22,7 @@ class _DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     super.initState();
-    Provider.of<Auth>(context, listen: false).connectSocket(context);
+    Provider.of<Auth>(context, listen: false).connectSocket(context).then((_) => CallManager.instance.init(context));
   }
 
   void openFriendList() {

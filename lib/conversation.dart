@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rikimaru_chat/cache_avatar.dart';
 import 'package:rikimaru_chat/models/auth_model.dart';
+import 'package:rikimaru_chat/models/call_modal.dart';
 import 'package:rikimaru_chat/models/conversation_model.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -96,6 +97,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             const Text("Status", style: TextStyle(color: Colors.grey))
                           ],
                         ),
+                      ),
+                      InkWell(
+                        onTap: (){
+                          final conversation = Provider.of<Conversation>(context, listen: false).data.firstWhere((element) => element["conversation_id"] == conversationId);
+                          List users = conversation["users"];
+                          final userId = Provider.of<Auth>(context, listen: false).userId;
+                          final friend = users.firstWhere((element) => element["user_id"] != userId);
+                          CallManager.instance.calling(context, friend);
+                        },
+                        child: const Icon(Icons.camera),
                       )
                     ],
                   ),

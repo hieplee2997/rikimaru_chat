@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:phoenix_wings/phoenix_wings.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:rikimaru_chat/models/call_modal.dart';
 import 'package:rikimaru_chat/models/conversation_model.dart';
 import 'package:rikimaru_chat/models/user_model.dart';
 import 'package:rikimaru_chat/models/utils.dart';
@@ -35,7 +36,7 @@ class Auth extends ChangeNotifier {
   }
 
   Future<void> connectSocket(BuildContext context) async {
-    _socket = PhoenixSocket('ws://192.168.3.6:4000/socket/websocket');
+    _socket = PhoenixSocket('ws://192.168.204.162:4000/socket/websocket');
     await _socket.connect();
     _channel = _socket.channel('user:$_userId');
     var channel = _channel;
@@ -58,6 +59,9 @@ class Auth extends ChangeNotifier {
     channel.on("update_info_friend", (data, ref, joinRef) {
       Provider.of<User>(context, listen: false).updateInfoFriend(data!);
       Provider.of<Conversation>(context, listen: false).updateConversation(data);
+    });
+    channel.on("call", (data, ref, joinRef) {
+      Provider.of<Calls>(context, listen: false).onMessage(data, context);
     });
   }
   Future<bool> loginWithPassword(String userName, String password) async {
